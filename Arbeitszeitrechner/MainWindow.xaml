@@ -1,0 +1,199 @@
+﻿<Window x:Class="ArbeitszeitBerechner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Arbeitszeit berechnen" Height="750" Width="600"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:ArbeitszeitBerechner">
+
+    <Window.Resources>
+        <!-- Styles -->
+        <Style TargetType="{x:Type Calendar}">
+            <Setter Property="Foreground" Value="DimGray" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="LightGray" />
+        </Style>
+
+        <Style TargetType="{x:Type CalendarDayButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CalendarDayButton}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Ellipse x:Name="DayButtonBackground" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" />
+                            <ContentPresenter x:Name="DayButtonContent" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Path=Tag, RelativeSource={RelativeSource TemplatedParent}}" Value="IsFullWorkDay">
+                                <Setter TargetName="DayButtonBackground" Property="Fill" Value="#1EB980" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Label">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Foreground" Value="#1EB980" />
+            <Setter Property="Margin" Value="5,10,5,0" />
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="5,0" />
+        </Style>
+
+        <!-- Buttons -->
+        <Style TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#1EB980" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <!-- Add the SharedSizeGroup property -->
+            <Setter Property="Width" Value="200" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#128061" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+
+        <!-- Result TextBlocks -->
+        <Style TargetType="TextBlock" x:Key="ResultTextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="5,10,5,0" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="WeekdayTextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Foreground" Value="#1EB980" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- StackPanel for month display and navigation buttons -->
+        <StackPanel Margin="20" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Vorheriger Monat" Click="BtnVorherigerMonat_Click" Margin="0,0,10,0"/>
+            <TextBlock x:Name="txtMonatJahr" FontWeight="Bold" FontSize="16" Margin="0,5"/>
+            <Button Content="Nachfolgender Monat" Click="BtnNachfolgenderMonat_Click" Margin="10,0,0,0"/>
+        </StackPanel>
+
+        <!-- ListBox for displaying the data -->
+        <DataGrid x:Name="dataGridMonatsdaten" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="200" Margin="20,10"
+          AutoGenerateColumns="False" SelectedValue="{Binding SelectedDayData, Mode=TwoWay}"
+          SelectedValuePath="." SelectionChanged="DataGridMonatsdaten_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Datum" Binding="{Binding Datum, StringFormat={}{0:dd.MM.yyyy}}" />
+                <DataGridTextColumn Header="Arbeitsbeginn" Binding="{Binding Arbeitsbeginn, StringFormat={}{0:hh\\:mm}}" />
+                <DataGridTextColumn Header="Pausenbeginn" Binding="{Binding Pausenbeginn, StringFormat={}{0:hh\\:mm}}" />
+                <DataGridTextColumn Header="Pausenende" Binding="{Binding Pausenende, StringFormat={}{0:hh\\:mm}}" />
+                <DataGridTextColumn Header="Arbeitsende" Binding="{Binding Arbeitsende, StringFormat={}{0:hh\\:mm}}" />
+                <DataGridTextColumn Header="Arbeitszeit" Binding="{Binding Arbeitszeit, StringFormat={}{0:hh\\:mm}}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Grid for Arbeitszeit Details -->
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Arbeitszeit input fields and labels -->
+            <Label Content="Datum:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" />
+            <DatePicker x:Name="datePicker" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,20,0" />
+
+            <Label Content="Arbeitszeit:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox IsReadOnly="True" x:Name="txtArbeitszeit" Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,20,0" />
+
+            <Label Content="Arbeitszeit gesamt:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox IsReadOnly="True" x:Name="txtArbeitszeitGesamt" Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,20,0" />
+
+            <Label Content="Arbeitsbeginn:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox x:Name="txtArbeitsbeginn" Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,20,0" TextChanged="TextBox_TextChanged"
+                     Text="{Binding Arbeitsbeginn, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Content="Pausenbeginn:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox x:Name="txtPausenbeginn" Grid.Row="4" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,20,0" TextChanged="TextBox_TextChanged"
+                     Text="{Binding Pausenbeginn, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Content="Pausenende:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox x:Name="txtPausenende" Grid.Row="5" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,20,0" TextChanged="TextBox_TextChanged"
+                     Text="{Binding Pausenende, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Content="Arbeitsende:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox x:Name="txtArbeitsende" Grid.Row="6" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,20,0" TextChanged="TextBox_TextChanged"
+                     Text="{Binding Arbeitsende, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Button Content="Arbeitszeit speichern" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" 
+            Click="BtnSpeichern_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10" />
+
+            <Button Name="btnArbeitszeitAendern" Content="Arbeitszeit ändern" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" 
+            Click="BtnArbeitszeitAendern_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,5" />
+            <Button Name="btnArbeitszeitLoeschen" Content="Arbeitszeit löschen" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" 
+            Click="BtnArbeitszeitLoeschen_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,5">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="FontFamily" Value="Segoe UI" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Background" Value="#FF3D3D" />
+                        <Setter Property="Padding" Value="10,5" />
+                        <Setter Property="Margin" Value="5" />
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="Width" Value="200" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#BF3D3D" />
+                            </Trigger>
+                            <DataTrigger Binding="{Binding SelectedDayData, ElementName=dataGridMonatsdaten}" Value="{x:Null}">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>
