@@ -89,6 +89,7 @@ namespace ArbeitszeitBerechner
             {
                 DateTime selectedDate = datePicker.SelectedDate ?? DateTime.MinValue;
 
+
                 // Check if an entry with the selected date already exists
                 bool entryExists = arbeitszeitenList.Any(item => item.Datum.Date == selectedDate.Date);
 
