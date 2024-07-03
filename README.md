@@ -8,9 +8,7 @@ Ein einfacher Arbeitszeitrechner geschrieben in C# mit WPF, um meine Arbeitsstun
 - [Funktionsweise](#funktionsweise)
 - [Installation](#installation)
 - [Nutzung](#nutzung)
-- [Beispiel](#beispiel)
-- [Beiträge](#beiträge)
-- [Lizenz](#lizenz)
+- [Screenshots](#screenshots)
 
 ## Hintergrund
 
@@ -50,14 +48,6 @@ Ich habe dieses Projekt gestartet, als ich ein Praktikum begonnen habe, bei dem 
 4. Wechsle zwischen den Monaten, um vergangene oder zukünftige Arbeitszeiten zu sehen.
 5. Bearbeite bereits erstellte Einträge bei Bedarf.
 
-## Beispiel
+## Screenshots
 
 ![Screenshot](screenshot.png)
-
-## Beiträge
-
-Beiträge sind willkommen! Forke das Repository und erstelle einen Pull-Request.
-
-## Lizenz
-
-Dieses Projekt ist lizenziert unter der MIT-Lizenz - siehe die [LICENSE](LICENSE) Datei für Details.
